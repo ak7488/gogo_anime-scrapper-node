@@ -228,7 +228,7 @@ const sbDownloadLink = async () => {
                 const qualtiy = $element.find("td:nth-child(2)").html();
                 urls.push({
                     ep_link: videoUrl,
-                    qualtiy: "watch " + qualtiy,
+                    quality: "watch " + qualtiy,
                 });
                 if (urls.length === 2) {
                     resolve(urls);

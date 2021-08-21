@@ -31,8 +31,6 @@ async function newSeason(page) {
         pageNumbers.push(pageNo);
     });
 
-    console.log("pageNumbers  ", pageNumbers);
-
     return await [anime_list, pageNumbers];
 }
 
@@ -114,15 +112,11 @@ async function search(query, page) {
         pageNumbers.push(pageNo);
     });
 
-    console.log("pageNumbers  ", pageNumbers);
-
     return await [anime_list, pageNumbers];
 }
 
 async function tags(query, page) {
     var anime_list = [];
-
-    console.log(query, page);
 
     res = await axios.get(`https://gogoanime.vc/genre/${query}?page=${page}`);
     const body = await res.data;
@@ -150,8 +144,6 @@ async function tags(query, page) {
         pageNo = $elements.find("a").html();
         pageNumbers.push(pageNo);
     });
-
-    console.log("pageNumbers  ", pageNumbers);
 
     return await [anime_list, pageNumbers];
 }
@@ -206,6 +198,14 @@ async function watchAnime(episode_id) {
     return await ep;
 }
 
+const epLink = async (link) => {
+    const res = await axios(link);
+    const body = await res.data;
+    const $2 = cheerio.load(body);
+    const videoUrl = $2("#container > div > span > a").attr("href");
+    return await videoUrl;
+};
+
 const sbDownloadLink = async () => {
     return new Promise(async (resolve, reject) => {
         const res = await axios("https://sbplay.one/d/lxm7bnpd7d9h.html");
@@ -220,10 +220,7 @@ const sbDownloadLink = async () => {
                 if (!d) return;
                 d = d.match(/'([^']+)'/g).map((e) => e.replace(/'/g, ""));
                 d = `https://sbplay.one/dl?op=download_orig&id=${d[0]}&mode=${d[1]}&hash=${d[2]}`;
-                const res = await axios(d);
-                const body = await res.data;
-                const $2 = cheerio.load(body);
-                const videoUrl = $2("#container > div > span > a").attr("href");
+                const videoUrl = await epLink(d);
 
                 const qualtiy = $element.find("td:nth-child(2)").html();
                 urls.push({

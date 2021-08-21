@@ -36,6 +36,7 @@ app.get("/api/getAnime/:query", async (req, res) => {
 
 app.get("/api/getEpisode/:query", async (req, res) => {
     const result = await scapper.watchAnime(req.params.query);
+    console.log(result);
     res.header("Content-Type", "application/json");
     res.send(JSON.stringify(result, null, 4));
 });
@@ -48,6 +49,13 @@ app.get("/api/recent/:page", async (req, res) => {
 
 app.get("/api/tag/:quary/:page", async (req, res) => {
     const result = await scapper.tags(req.params.quary, req.params.page);
+    res.header("Content-Type", "application/json");
+    res.send(JSON.stringify(result, null, 4));
+});
+
+app.get("/api/sb-download/:quary", async (req, res) => {
+    const result = await scapper.getSBDownloadLink(req.params.quary);
+    console.log(result);
     res.header("Content-Type", "application/json");
     res.send(JSON.stringify(result, null, 4));
 });

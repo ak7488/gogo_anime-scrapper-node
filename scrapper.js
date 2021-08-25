@@ -274,39 +274,56 @@ const a = (d) => {
 
 //lxm7bnpd7d9h.html
 async function getSBDownloadLink(ep_page_name) {
-    const promise = new Promise(async (resolve, reject) => {
-        ep_array = [];
+    return new Promise(async (resolve, reject) => {
+        const page1a1 =
+            "#container > div > table > tbody > tr:nth-child(2) > td:nth-child(1) > a";
+        const page1a2 =
+            "#container > div > table > tbody > tr:nth-child(3) > td:nth-child(1) > a";
+        const page1quality1 =
+            "#container > div > table > tbody > tr:nth-child(2) > td:nth-child(2)";
+        const page1quality2 =
+            "#container > div > table > tbody > tr:nth-child(3) > td:nth-child(2)";
+        const page2a = "#container > div > span > a";
 
-        res = await axios(`https://sbplay.one/d/${ep_page_name}`);
-        const body = await res.data;
-        $ = cheerio.load(body);
+        const res1 = await axios(`https://sbplay.one/d/${ep_page_name}`);
+        const $1 = cheerio.load(res1.data);
+        const page1Link1Parts = $1(page1a1)
+            .attr("onclick")
+            .replace(/'|\(|\)|download_video/g, "")
+            .split(",");
+        const page1Link2Parts = $1(page1a2)
+            .attr("onclick")
+            .replace(/'|\(|\)|download_video/g, "")
+            .split(",");
+        const quality1 = $1(page1quality1).html();
+        const quality2 = $1(page1quality2).html();
+        const page1Link1 = `https://sbplay.one/dl?op=download_orig&id=${page1Link1Parts[0]}&mode=${page1Link1Parts[1]}&hash=${page1Link1Parts[2]}`;
+        const page1Link2 = `https://sbplay.one/dl?op=download_orig&id=${page1Link2Parts[0]}&mode=${page1Link2Parts[1]}&hash=${page1Link2Parts[2]}`;
 
-        $("#container > div > table > tbody > tr").each(
-            async (index, element) => {
-                $element = $(element);
-                d = $element.find("a").attr("onclick");
-                if (d) {
-                    d = d.match(/'([^']+)'/g).map((e) => e.replace(/'/g, ""));
-                    d = `https://sbplay.one/dl?op=download_orig&id=${d[0]}&mode=${d[1]}&hash=${d[2]}`;
-                    const videoUrl = await a(d);
+        const res2 = await axios(page1Link1);
+        const $2 = cheerio.load(res2.data);
+        const videoLink1 = $2(page2a).attr("href");
 
-                    quality = $element.find("td:nth-child(2)").html();
-                    ep_array.push({
-                        ep_link: videoUrl,
-                        quality: "watch " + quality,
-                    });
-                    console.log(ep_array.length);
-                }
+        const res3 = await axios(page1Link2);
+        const $3 = cheerio.load(res3.data);
+        const videoLink2 = $3(page2a).attr("href");
+
+        const id = setInterval(() => {
+            if (videoLink1 && videoLink2) {
+                resolve([
+                    {
+                        quality: quality1,
+                        link: videoLink1,
+                    },
+                    {
+                        quality: quality2,
+                        link: videoLink2,
+                    },
+                ]);
+                clearInterval(id);
             }
-        );
-
-        setTimeout(() => {
-            resolve(ep_array);
-            console.log(ep_array);
-        }, 2000);
+        }, 500);
     });
-
-    return promise;
 }
 
 module.exports = {

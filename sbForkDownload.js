@@ -41,11 +41,11 @@ async function getSBDownloadLink(ep_page_name) {
                 resolve([
                     {
                         quality: quality1,
-                        link: videoLink1,
+                        ep_link: videoLink1,
                     },
                     {
                         quality: quality2,
-                        link: videoLink2,
+                        ep_link: videoLink2,
                     },
                 ]);
                 clearInterval(id);

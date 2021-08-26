@@ -1,6 +1,7 @@
 const scapper = require("./scrapper");
 const express = require("express");
 const { env } = require("process");
+const { fork } = require("child_process");
 const cors = require("cors");
 
 const app = express();
@@ -53,11 +54,19 @@ app.get("/api/tag/:quary/:page", async (req, res) => {
     res.send(JSON.stringify(result, null, 4));
 });
 
+// app.get("/api/sb-download/:quary", async (req, res) => {
+//     const result = await scapper.getSBDownloadLink(req.params.quary);
+//     console.log(result);
+//     res.header("Content-Type", "application/json");
+//     res.send(JSON.stringify(result, null, 4));
+// });
+
 app.get("/api/sb-download/:quary", async (req, res) => {
-    const result = await scapper.getSBDownloadLink(req.params.quary);
-    console.log(result);
-    res.header("Content-Type", "application/json");
-    res.send(JSON.stringify(result, null, 4));
+    const child = fork("./sbForkDownload.js");
+    child.send(`start_${req.params.quary}`);
+    child.on("message", (message) => {
+        res.send(message);
+    });
 });
 
 port = env.PORT || 5000;
